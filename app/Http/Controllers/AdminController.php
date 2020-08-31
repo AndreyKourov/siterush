@@ -39,14 +39,12 @@ class AdminController extends Controller
     public function store(Request $request)
     {
         $block = new Block;
-        // обрабатываем изображение из формы
+    
         $fname = $request->file('imagepath');
-        // если картинка была загружена
+        
         if($fname !== null) {
-            // берем из файла
             $original_name = $fname->getClientOriginalName();
             $fname->move(public_path().'/images', $original_name);
-            // перенос в таблицу blocks путь к картинки imagepath
             $block->imagepath='/images/'.$original_name;    
         } else {
             $block->imagepath='';
