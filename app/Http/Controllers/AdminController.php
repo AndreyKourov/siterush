@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Option;
 use App\Block;
+use App\User;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
@@ -26,8 +27,14 @@ class AdminController extends Controller
     public function create()
     {
         $block = new Block;
-        $options = Option::pluck('optionname', 'id');
-        return view('admin.create', [ 'block'=>$block, 'options'=>$options, 'page'=>'Admin']);
+        //$options = new Option;
+        //$options = Option::where( 'optionname')->get();
+        //$options = Option::pluck('optionname', 'id');   
+        //$options = Option::all();
+        $users = User::pluck('name', 'id');
+        
+        return view('admin.create', [ 'block'=>$block, 'users'=>$users, 'page'=>'Admin']);
+        //return view('admin.create', [ 'block'=>$block, 'options'=>$options, 'page'=>'Admin']);
     }
 
     /**
@@ -39,7 +46,9 @@ class AdminController extends Controller
     public function store(Request $request)
     {
         $block = new Block;
-    
+        //$option = new Option;
+        //$option = Option::all();
+
         $fname = $request->file('imagepath');
         
         if($fname !== null) {
@@ -49,7 +58,8 @@ class AdminController extends Controller
         } else {
             $block->imagepath='';
         }
-    
+        
+        //$option->optionname = $request->optionid;
         $block->optionid = $request->optionid;
         $block->title = $request->title;
         $block->content = $request->block_content; 
@@ -81,7 +91,10 @@ class AdminController extends Controller
      */
     public function edit($id)
     {
-        //
+        $block = Block::find($id);
+        $options = Option::pluck('optionname', 'id');
+
+        return view('admin.edit', ['page'=>'Admin', 'block'=>$block, 'options'=>$options]);
     }
 
     /**
@@ -93,7 +106,20 @@ class AdminController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $block = Block::find($id);
+        $block->optionid = $request->optionid;
+        $block->title = $request->title;
+        $block->_content = $request->_content;
+
+        $fname = $request->file('imagepath');
+        if($fname !== null) {
+            $original_name = $request->file('imagepath')->getClientOriginalName();
+            $request->file('imagepath')->move(public_path().'/images', $original_name);
+            $block->imagepath = 'image/'.$original_name;
+        }
+
+        $block->save();
+        return redirect('about/'.$block->optionid);
     }
 
     /**
@@ -104,6 +130,8 @@ class AdminController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $block = Block::find($id);
+        $block->delete();
+        return redirect('about');
     }
 }

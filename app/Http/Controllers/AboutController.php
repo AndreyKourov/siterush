@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Block;
+use App\Option;
 use Illuminate\Http\Request;
 
 class AboutController extends Controller
@@ -13,7 +15,9 @@ class AboutController extends Controller
      */
     public function index()
     {
-        return view('about.index', ['page'=>'About']);
+        $option = Option::all();
+        $block = Block::all();
+        return view('about.index', ['page'=>'About', 'option'=>$option, 'block'=>$block, 'id'=>0]);
     }
 
     /**
